@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update>
+    <sys_documentation element="type" label="Type" language="en" table="x_24859_instcustom_db_object_metric">
+        <sys_documentation action="INSERT_OR_UPDATE">
+            <element>type</element>
+            <help/>
+            <hint/>
+            <label>Type</label>
+            <language>en</language>
+            <name>x_24859_instcustom_db_object_metric</name>
+            <plural>Types</plural>
+            <sys_class_name>sys_documentation</sys_class_name>
+            <sys_created_by>todd.fudala</sys_created_by>
+            <sys_created_on>2018-05-31 15:49:18</sys_created_on>
+            <sys_id>8ff04cafdb1213000fe4788dbf96190b</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_name>Type</sys_name>
+            <sys_package display_value="Instance Customizations" source="x_24859_instcustom">a78d7fd7db1213000fe4788dbf961923</sys_package>
+            <sys_policy/>
+            <sys_scope display_value="Instance Customizations">a78d7fd7db1213000fe4788dbf961923</sys_scope>
+            <sys_update_name>sys_documentation_x_24859_instcustom_db_object_metric_type_en</sys_update_name>
+            <sys_updated_by>todd.fudala</sys_updated_by>
+            <sys_updated_on>2018-05-31 15:49:18</sys_updated_on>
+            <url/>
+            <url_target/>
+        </sys_documentation>
+    </sys_documentation>
+</record_update>

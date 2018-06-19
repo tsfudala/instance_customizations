@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update node_type="sys_grid_canvas" unload_date="2018-06-19 15:23:09">
+    <sys_grid_canvas action="INSERT_OR_UPDATE">
+        <legacy_page display_value="PA New Tab">6fbccdabdbd213000fe4788dbf9619c2</legacy_page>
+        <name>PA New Tab</name>
+        <sys_class_name>sys_grid_canvas</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-05-31 21:20:18</sys_created_on>
+        <sys_id>2fbccdabdbd213000fe4788dbf9619c3</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>PA New Tab</sys_name>
+        <sys_package display_value="Instance Customizations" source="x_24859_instcustom">a78d7fd7db1213000fe4788dbf961923</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Instance Customizations">a78d7fd7db1213000fe4788dbf961923</sys_scope>
+        <sys_update_name>sys_grid_canvas_2fbccdabdbd213000fe4788dbf9619c3</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-05-31 21:20:18</sys_updated_on>
+        <related_items_node>
+            <sys_grid_canvas_pane action="INSERT_OR_UPDATE">
+                <grid_canvas display_value="PA New Tab">2fbccdabdbd213000fe4788dbf9619c3</grid_canvas>
+                <height>18</height>
+                <portal_widget display_value="Created 2018-05-31 14:22:12">eb2dcdabdbd213000fe4788dbf9619bd</portal_widget>
+                <posx>0</posx>
+                <posy>0</posy>
+                <sys_class_name>sys_grid_canvas_pane</sys_class_name>
+                <sys_created_by>admin</sys_created_by>
+                <sys_created_on>2018-05-31 21:22:13</sys_created_on>
+                <sys_id>e72dc5ebdbd213000fe4788dbf9619dd</sys_id>
+                <sys_mod_count>1</sys_mod_count>
+                <sys_name>2fbccdabdbd213000fe4788dbf9619c3</sys_name>
+                <sys_package display_value="Instance Customizations" source="x_24859_instcustom">a78d7fd7db1213000fe4788dbf961923</sys_package>
+                <sys_policy/>
+                <sys_scope display_value="Instance Customizations">a78d7fd7db1213000fe4788dbf961923</sys_scope>
+                <sys_update_name>sys_grid_canvas_pane_e72dc5ebdbd213000fe4788dbf9619dd</sys_update_name>
+                <sys_updated_by>admin</sys_updated_by>
+                <sys_updated_on>2018-05-31 21:22:18</sys_updated_on>
+                <width>6</width>
+                <related_items_node>
+                    <sys_portal action="INSERT_OR_UPDATE">
+                        <dropzone/>
+                        <offset/>
+                        <page display_value="PA New Tab">6fbccdabdbd213000fe4788dbf9619c2</page>
+                        <summary>Fields Added by Base Class</summary>
+                        <sys_created_by>admin</sys_created_by>
+                        <sys_created_on>2018-05-31 21:22:12</sys_created_on>
+                        <sys_id>eb2dcdabdbd213000fe4788dbf9619bd</sys_id>
+                        <sys_mod_count>1</sys_mod_count>
+                        <sys_updated_by>admin</sys_updated_by>
+                        <sys_updated_on>2018-05-31 21:22:13</sys_updated_on>
+                        <related_items_node>
+                            <sys_grid_canvas_pane action="INSERT_OR_UPDATE">
+                                <grid_canvas display_value="PA New Tab">2fbccdabdbd213000fe4788dbf9619c3</grid_canvas>
+                                <height>18</height>
+                                <portal_widget display_value="Created 2018-05-31 14:22:12">eb2dcdabdbd213000fe4788dbf9619bd</portal_widget>
+                                <posx>0</posx>
+                                <posy>0</posy>
+                                <sys_class_name>sys_grid_canvas_pane</sys_class_name>
+                                <sys_created_by>admin</sys_created_by>
+                                <sys_created_on>2018-05-31 21:22:13</sys_created_on>
+                                <sys_id>e72dc5ebdbd213000fe4788dbf9619dd</sys_id>
+                                <sys_mod_count>1</sys_mod_count>
+                                <sys_name>2fbccdabdbd213000fe4788dbf9619c3</sys_name>
+                                <sys_package display_value="Instance Customizations" source="x_24859_instcustom">a78d7fd7db1213000fe4788dbf961923</sys_package>
+                                <sys_policy/>
+                                <sys_scope display_value="Instance Customizations">a78d7fd7db1213000fe4788dbf961923</sys_scope>
+                                <sys_update_name>sys_grid_canvas_pane_e72dc5ebdbd213000fe4788dbf9619dd</sys_update_name>
+                                <sys_updated_by>admin</sys_updated_by>
+                                <sys_updated_on>2018-05-31 21:22:18</sys_updated_on>
+                                <width>6</width>
+                            </sys_grid_canvas_pane>
+                        </related_items_node>
+                        <related_items_node>
+                            <sys_portal_preferences action="INSERT_OR_UPDATE">
+                                <name>help_text_window</name>
+                                <portal_section display_value="Created 2018-05-31 14:22:12">eb2dcdabdbd213000fe4788dbf9619bd</portal_section>
+                                <sys_created_by>admin</sys_created_by>
+                                <sys_created_on>2018-05-31 21:22:12</sys_created_on>
+                                <sys_id>232dc5ebdbd213000fe4788dbf9619dc</sys_id>
+                                <sys_mod_count>0</sys_mod_count>
+                                <sys_updated_by>admin</sys_updated_by>
+                                <sys_updated_on>2018-05-31 21:22:12</sys_updated_on>
+                                <value>report_widget_description</value>
+                            </sys_portal_preferences>
+                            <sys_portal_preferences action="INSERT_OR_UPDATE">
+                                <name>title</name>
+                                <portal_section display_value="Created 2018-05-31 14:22:12">eb2dcdabdbd213000fe4788dbf9619bd</portal_section>
+                                <sys_created_by>admin</sys_created_by>
+                                <sys_created_on>2018-05-31 21:22:12</sys_created_on>
+                                <sys_id>6b2dc5ebdbd213000fe4788dbf9619dc</sys_id>
+                                <sys_mod_count>0</sys_mod_count>
+                                <sys_updated_by>admin</sys_updated_by>
+                                <sys_updated_on>2018-05-31 21:22:12</sys_updated_on>
+                                <value>Fields Added by Base Class</value>
+                            </sys_portal_preferences>
+                            <sys_portal_preferences action="INSERT_OR_UPDATE">
+                                <name>renderer</name>
+                                <portal_section display_value="Created 2018-05-31 14:22:12">eb2dcdabdbd213000fe4788dbf9619bd</portal_section>
+                                <sys_created_by>admin</sys_created_by>
+                                <sys_created_on>2018-05-31 21:22:12</sys_created_on>
+                                <sys_id>6f2dc5ebdbd213000fe4788dbf9619db</sys_id>
+                                <sys_mod_count>0</sys_mod_count>
+                                <sys_updated_by>admin</sys_updated_by>
+                                <sys_updated_on>2018-05-31 21:22:12</sys_updated_on>
+                                <value>com.glide.ui.portal.RenderReport</value>
+                            </sys_portal_preferences>
+                            <sys_portal_preferences action="INSERT_OR_UPDATE">
+                                <name>report_type</name>
+                                <portal_section display_value="Created 2018-05-31 14:22:12">eb2dcdabdbd213000fe4788dbf9619bd</portal_section>
+                                <sys_created_by>admin</sys_created_by>
+                                <sys_created_on>2018-05-31 21:22:12</sys_created_on>
+                                <sys_id>a72dc5ebdbd213000fe4788dbf9619dc</sys_id>
+                                <sys_mod_count>0</sys_mod_count>
+                                <sys_updated_by>admin</sys_updated_by>
+                                <sys_updated_on>2018-05-31 21:22:12</sys_updated_on>
+                                <value>donut</value>
+                            </sys_portal_preferences>
+                            <sys_portal_preferences action="INSERT_OR_UPDATE">
+                                <name>can_subscribe</name>
+                                <portal_section display_value="Created 2018-05-31 14:22:12">eb2dcdabdbd213000fe4788dbf9619bd</portal_section>
+                                <sys_created_by>admin</sys_created_by>
+                                <sys_created_on>2018-05-31 21:22:12</sys_created_on>
+                                <sys_id>e32dc5ebdbd213000fe4788dbf9619dc</sys_id>
+                                <sys_mod_count>0</sys_mod_count>
+                                <sys_updated_by>admin</sys_updated_by>
+                                <sys_updated_on>2018-05-31 21:22:12</sys_updated_on>
+                                <value>true</value>
+                            </sys_portal_preferences>
+                            <sys_portal_preferences action="INSERT_OR_UPDATE">
+                                <name>sys_id</name>
+                                <portal_section display_value="Created 2018-05-31 14:22:12">eb2dcdabdbd213000fe4788dbf9619bd</portal_section>
+                                <sys_created_by>admin</sys_created_by>
+                                <sys_created_on>2018-05-31 21:22:12</sys_created_on>
+                                <sys_id>e32dcdabdbd213000fe4788dbf9619be</sys_id>
+                                <sys_mod_count>0</sys_mod_count>
+                                <sys_updated_by>admin</sys_updated_by>
+                                <sys_updated_on>2018-05-31 21:22:12</sys_updated_on>
+                                <value>f1e7cde7dbd213000fe4788dbf96199f</value>
+                            </sys_portal_preferences>
+                        </related_items_node>
+                    </sys_portal>
+                </related_items_node>
+            </sys_grid_canvas_pane>
+        </related_items_node>
+    </sys_grid_canvas>
+</record_update>
