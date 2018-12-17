@@ -2,7 +2,7 @@
 <record_update table="sys_report_users_groups">
     <sys_report_users_groups action="INSERT_OR_UPDATE">
         <group_id/>
-        <report_id display_value="Fields Added by Task Based Tables">cf980ce3db5213000fe4788dbf961915</report_id>
+        <report_id display_value="Fields Added to Task Based Tables">cf980ce3db5213000fe4788dbf961915</report_id>
         <sys_class_name>sys_report_users_groups</sys_class_name>
         <sys_created_by>todd.fudala</sys_created_by>
         <sys_created_on>2018-05-31 16:22:37</sys_created_on>

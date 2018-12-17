@@ -33,12 +33,12 @@
         <description/>
         <direction>minimize</direction>
         <display_column_lines>false</display_column_lines>
-        <display_grid>false</display_grid>
+        <display_grid>true</display_grid>
         <display_row_lines>false</display_row_lines>
         <donut_width_percent>50</donut_width_percent>
         <end_time/>
         <exp_report_attrs>true</exp_report_attrs>
-        <field>extends</field>
+        <field>super_class</field>
         <field_list/>
         <filter table="x_24859_instcustom_db_object_metric">^EQ<item endquery="true" field="" goto="false" newquery="false" operator="=" or="false" value=""/>
         </filter>
@@ -96,16 +96,16 @@
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2018-05-31 20:59:09</sys_created_on>
         <sys_id>f1e7cde7dbd213000fe4788dbf96199f</sys_id>
-        <sys_mod_count>0</sys_mod_count>
-        <sys_name>Fields Added by Base Class</sys_name>
+        <sys_mod_count>4</sys_mod_count>
+        <sys_name>Fields Added group by Extends Table</sys_name>
         <sys_package display_value="Instance Customizations" source="x_24859_instcustom">a78d7fd7db1213000fe4788dbf961923</sys_package>
         <sys_policy/>
         <sys_scope display_value="Instance Customizations">a78d7fd7db1213000fe4788dbf961923</sys_scope>
         <sys_update_name>sys_report_f1e7cde7dbd213000fe4788dbf96199f</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2018-05-31 20:59:09</sys_updated_on>
+        <sys_updated_on>2018-12-10 20:28:27</sys_updated_on>
         <table>x_24859_instcustom_db_object_metric</table>
-        <title>Fields Added by Base Class</title>
+        <title>Fields Added group by Extends Table</title>
         <title_horizontal_alignment>center</title_horizontal_alignment>
         <title_vertical_alignment>top</title_vertical_alignment>
         <to/>

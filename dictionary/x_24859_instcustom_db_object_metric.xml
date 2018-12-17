@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <database>
     <element label="DB Object Metric" max_length="40" name="x_24859_instcustom_db_object_metric" sizeclass="13452" type="collection">
-        <element label="Extends" max_length="80" name="extends" type="string"/>
         <element label="Field" max_length="80" name="field" type="string"/>
         <element label="Instance" max_length="40" name="instance" type="string"/>
         <element label="Name" max_length="80" name="name" type="string"/>
         <element label="Size" max_length="40" name="size" type="integer"/>
+        <element label="Extends Table" max_length="40" name="super_class" type="string"/>
         <element label="Type" max_length="80" name="type" type="string"/>
         <index name="index">
             <element name="field"/>

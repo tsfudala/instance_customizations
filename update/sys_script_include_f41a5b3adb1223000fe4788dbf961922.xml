@@ -1,0 +1,472 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_24859_instcustom.SPCatalogAnalyzer</api_name>
+        <client_callable>false</client_callable>
+        <description>Collects configuration and coding risks within Catalog objects that should be corrected for Service Portal compliance</description>
+        <name>SPCatalogAnalyzer</name>
+        <script><![CDATA[// This script is designed to aid in identifying issues that might impact the conversion of catalog items to Service Portal.
+// The suggestion is to copy this, update the values in 'itemSysIds' to the catalog items you wish to convert, and run as a
+// background script.
+
+// Some known caveats about these results:
+// -> Scripts in UI policies are not evaluated.
+// -> Commented code shows as false positives.
+
+// uncomment to target specific items
+/*
+var itemSysIds = [
+'76d675e7138a6704279b51a63244b057',
+'abcdedghijklmnopqrstuvwxyz123456'
+];
+ */
+
+// uncomment to target all catalog items
+/*
+var itemSysIds = [];
+var catalogItems = new GlideRecord('sc_cat_item');
+catalogItems.query();
+while (catalogItems.next()) {
+  itemSysIds.push(catalogItems.getUniqueValue());
+}
+*/
+
+var SPCatalogAnalyzer = Class.create();
+SPCatalogAnalyzer.prototype = {
+
+
+  // list of issues we're looking for
+  scriptFlags: [
+    'document.',
+    'window.',
+    '$(',
+    'jQuery',
+    '$j',
+    'getXMLWait',
+    'GlideRecord',
+    'getControl',
+    'getDisplayBox',
+    'getReference',
+    'evalJSON',
+    'gel('
+  ],
+
+
+  itemSysIds: [],
+  debug: false,
+  showJSON: false,
+  prettifyJSONResults: false,
+  showCSV: true,
+
+  initialize: function(itemSysIds) {
+    this.itemSysIds = itemSysIds;
+  },
+
+  analyze: function() {
+
+    var results = {};
+
+    var items = [];
+    var variableSetQuery = '';
+
+    var itemGR = new GlideRecord('sc_cat_item');
+    itemGR.addEncodedQuery('active=true^sys_idIN' + this.itemSysIds.join(','));
+    //itemGR.addQuery('name', this.itemSysIds[i]);
+    if (this.debug) {
+      gs.info('Using Search query for Items : {0}', itemGR.getEncodedQuery());
+    }
+    itemGR.query();
+
+
+
+    while (itemGR.next()) {
+
+      var itemResult = {};
+
+      gs.info('Evaluating catalog item {0} ( {1} )', itemGR.name, itemGR.sys_id);
+
+      variableSetQuery += 'sc_cat_item=' + itemGR.getUniqueValue() + (itemGR.hasNext() ? '^OR' : '');
+
+      itemResult.name = itemGR.getDisplayValue();
+      itemResult.sys_id = itemGR.getUniqueValue();
+      itemResult.ui_policies = this.checkUIPolicies(itemGR, 'catalog_item');
+      itemResult.variables = this.checkVariables(itemGR, 'cat_item');
+      itemResult.referenced_variable_sets = this.getItemVariableSets(itemGR);
+      itemResult.scripts = this.checkCatalogScripts(itemGR, 'cat_item');
+
+      items.push(itemResult);
+    }
+
+
+    results.items = items;
+    results.variable_sets = this._processVariableSets(variableSetQuery);
+
+    gs.info('Discovered {0} catalog items and {1} variable sets', results.items.length, results.variable_sets.length);
+    if (this.showJSON) {
+      gs.info('JSON Result is \n{0}', JSON.stringify(results));
+    }
+
+    if (this.prettifyJSONResults) {
+      this._showTabularResults(results);
+    }
+
+    if (this.showCSV) {
+      this.outputCSVResults(results);
+    }
+  },
+
+  _processVariableSets: function(variableSetQuery) {
+
+    var variableSetMapGR = new GlideRecord('io_set_item');
+    variableSetMapGR.addEncodedQuery(variableSetQuery);
+    variableSetMapGR.query();
+
+
+    var variableSetResults = [];
+    var usedVariableSets = [];  // TODO : just use the variableSetResults
+    while (variableSetMapGR.next()) {
+
+      var variableSetToInspect = variableSetMapGR.getValue('variable_set');
+
+      if (usedVariableSets.indexOf(variableSetToInspect) != -1) {
+        if (this.debug) {
+          gs.info('Already inspected ' + variableSetMapGR.getDisplayValue() + '. Skipping.');
+        }
+        continue;
+      }
+
+      var variableSetGR = variableSetMapGR.variable_set.getRefRecord();
+      var variableSetResult = {};
+
+      gs.info('Evaluating variable set {0} ( {1} )', variableSetGR.name, variableSetGR.sys_id);
+
+      variableSetResult.name = variableSetGR.getDisplayValue();
+      variableSetResult.sys_id = variableSetGR.getUniqueValue();
+      variableSetResult.ui_policies = this.checkUIPolicies(variableSetGR, 'variable_set');
+      variableSetResult.variables = this.checkVariables(variableSetGR, 'variable_set');
+      variableSetResult.scripts = this.checkCatalogScripts(variableSetGR, 'variable_set');
+
+      usedVariableSets.push(variableSetToInspect);
+      variableSetResults.push(variableSetResult);
+    }
+
+    return variableSetResults;
+  },
+
+  checkUIPolicies: function(parentGR, type) {
+
+    var uiPolicies = [];
+
+
+    // construct the encoded query
+    var uiPolicyQuery =
+      type + '=' + parentGR.sys_id + '^ui_type=0^active=true^NQ' +        // get 'Desktop' catalog scripts
+      //type + '=' + parentGR.sys_id + '^messagesISNOTEMPTY^active=true^NQ' +  // scripts with translated messages
+      type + '=' + parentGR.sys_id + '^active=true' +
+      this._addScriptFlags('script');                                         // scripts with the given strings
+
+
+    var desktopPolicies = new GlideRecord('catalog_ui_policy');
+    desktopPolicies.addQuery(type, parentGR.sys_id);
+    desktopPolicies.addQuery('ui_type', '0');
+    desktopPolicies.query();
+    while (desktopPolicies.next()) {
+
+      uiPolicies.push({
+        'name': desktopPolicies.getDisplayValue(),
+        'sys_id': desktopPolicies.getUniqueValue()
+      });
+    }
+
+    if (this.debug) {
+      gs.info('\t{0} has {1} Desktop UI policies', parentGR.name, uiPolicies.length);
+    }
+    return uiPolicies;
+  },
+
+  checkVariables: function(parentGR, type) {
+
+    var variablesResult = [];
+
+    var macroVariables = new GlideRecord('item_option_new');
+    macroVariables.addQuery('active=true^typeIN14,17^' + type + '=' + parentGR.sys_id);
+    macroVariables.query();
+
+    while (macroVariables.next()) {
+
+      variablesResult.push({
+        'name': macroVariables.getDisplayValue(),
+        'sys_id': macroVariables.getUniqueValue(),
+        'type': macroVariables.getValue('type') == '14' ? 'Macro' : 'Macro with Label',
+        'question': macroVariables.getValue('question_text')
+      });
+    }
+
+    if (this.debug) {
+      gs.info('\t{0} has {1} Macro Variables.', parentGR.name, variablesResult.length);
+    }
+    return variablesResult;
+  },
+
+  getItemVariableSets: function(itemGR) {
+
+    var linkedVariableSets = [];
+
+    var variableSets = new GlideRecord('io_set_item');
+    variableSets.addQuery('sc_cat_item', itemGR.sys_id);
+    variableSets.query();
+
+    while (variableSets.next()) {
+      linkedVariableSets.push(variableSets.getValue('variable_set'));
+    }
+
+    if (this.debug) {
+      gs.info('\t{0} has {1} attached variable sets', itemGR.name, linkedVariableSets.length);
+    }
+    return linkedVariableSets;
+  },
+
+
+  _addScriptFlags: function(field) {
+
+    var scriptQuery = '';
+    for (var i = 0; i < this.scriptFlags.length; i++) {
+      scriptQuery += '^' + (i != 0 ? 'OR' : '') + field + 'LIKE' + this.scriptFlags[i];
+    }
+
+    return scriptQuery;
+  },
+
+  checkCatalogScripts: function(parentGR, type) {
+
+    // construct the encoded query
+    var scriptQuery =
+      type + '=' + parentGR.sys_id + '^ui_type=0^applies_catalog=true^active=true^NQ' +        // get 'Desktop' catalog scripts
+      //type + '=' + parentGR.sys_id + '^messagesISNOTEMPTY^applies_catalog=true^active=true^NQ' +  // scripts with translated messages
+      type + '=' + parentGR.sys_id + '^active=true^applies_catalog=true' +
+      this._addScriptFlags('script');                                         // scripts with the given strings
+
+    /*
+    cat_item=xxx^ui_type=0^active=true^NQ
+    cat_item=xxx^messagesISNOTEMPTY^active=true^NQ
+    cat_item=x^active=true^scriptLIKEdocument.^ORscriptLIKEwindow.^ORscriptLIKEjquery
+     */
+
+    var catalogClientScripts = new GlideRecord('catalog_script_client');
+    catalogClientScripts.addEncodedQuery(scriptQuery);
+    catalogClientScripts.query();
+
+    var scriptResults = [];
+
+    // iterate each
+    while (catalogClientScripts.next()) {
+
+      scriptResults.push({
+        'name': catalogClientScripts.getDisplayValue(),
+        'sys_id': catalogClientScripts.getUniqueValue(),
+        'issues': this._parseScriptIssues(catalogClientScripts)
+      });
+    }
+
+    if (this.debug) {
+      gs.info('\t{0} has {1} dangerous client scripts', parentGR.name, scriptResults.length);
+    }
+    return scriptResults;
+  },
+
+  // inspect an individual script for a set of issues.
+  _parseScriptIssues: function(scriptGR) {
+
+    var scriptIssueResults = [];
+
+    if (!scriptGR) {
+      return scriptIssueResults;
+    }
+
+    scriptIssueResults = this._getScriptIssues(scriptGR.getValue('script'));
+
+    if (scriptGR.getValue('ui_type') == 0) {
+      scriptIssueResults.push({
+        issue: 'Desktop-only Catalog Script',
+        count: 1
+      });
+    }
+    /*
+    if (scriptGR.getValue('messages') != '' && scriptGR.getValue('messages') != null) {
+      scriptIssueResults.push({
+        issue : 'Translated Messages',
+        count : 1
+      });
+    }
+     */
+
+    var total = scriptIssueResults.reduce(function(a, b) {
+      return a + b['count'];
+    }, 0);
+
+    if (this.debug) {
+      gs.info('\t{0} has {1} issues of {2} different types', scriptGR.getDisplayValue(), total, scriptIssueResults.length);
+    }
+    return scriptIssueResults;
+  },
+
+  _getScriptIssues: function(scriptString) {
+
+    var scriptIssueResults = [];
+
+    for (var i = 0; i < this.scriptFlags.length; i++) {
+
+      var issue = this._escapeRegExp(this.scriptFlags[i]);
+      //gs.info('Searching for issue ' + issue);
+
+      var issueRegex = new RegExp(issue, 'gi');
+      var count = (scriptString.match(issueRegex) || []).length;
+      if (count > 0) {
+        scriptIssueResults.push({
+          issue: this.scriptFlags[i],
+          count: count
+        });
+      }
+    }
+
+    return scriptIssueResults;
+  },
+
+  _escapeRegExp: function(str) {
+    return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+  },
+
+  _showTabularResults: function(jsonResults) {
+
+    for (var i = 0; i < jsonResults.items.length; i++) {
+      this._showTabularItemResults(jsonResults.items[i]);
+    }
+
+    for (var j = 0; j < jsonResults.variable_sets.length; j++) {
+      this._showGenericTabularResults(jsonResults.variable_sets[j]);
+    }
+  },
+
+  _showTabularItemResults: function(itemJson) {
+
+    this._showGenericTabularResults(itemJson);
+  },
+
+  _showGenericTabularResults: function(json) {
+
+
+    gs.info('\n\nResults for : {0}', json.name);
+
+    var policies = json.ui_policies.map(function(a) { return a.name; });
+    gs.info('Desktop UI Policies :: ' + policies.join(','));
+
+
+    var macros = json.variables.map(function(a) { return a.name; });
+    gs.info('Macro Variables :: ' + macros.join(','));
+
+
+    for (var i = 0; i < json.scripts.length; i++) {
+      var script = json.scripts[i];
+
+      for (var j = 0; j < script.issues.length; j++) {
+        gs.info('Catalog Client Script "{0}" :: {1} // {2} instances', script.name, script.issues[j].issue, script.issues[j].count);
+      }
+
+    }
+  },
+
+  outputCSVResults: function(results) {
+
+    var csvOut = 'Item,Total Issues,Item Issues,Variable Set Issues,Desktop UI Policies,Macro Variables,Catalog Script Issues,Variable Set Desktop UI Policies,Variable Set Macros,Variable Set Script Issues\n';
+
+    for (var i = 0; i < results.items.length; i++) {
+
+      var item = results.items[i],
+        policyIssues = item.ui_policies.length,
+        variablesIssues = item.variables.length,
+        scriptsIssues = this._getScriptTotal(item),
+        vSetPolicyIssues = 0,
+        vSetVariableIssues = 0,
+        vSetScriptIssues = 0,
+        vSetTotalIssues = 0,
+        totalIssues = 0,
+        totalIssuesNoVSet = 0;
+
+
+      for (var j = 0; j < item.referenced_variable_sets.length; j++) {
+
+        var id = item.referenced_variable_sets[j];
+        var vSet;
+
+        if (id != '8cdb5e80e49521009a6ab10e41b82079') {  // skip 'Customer Info' set
+          for (var k = 0; k < results.variable_sets.length; k++) {
+            if (results.variable_sets[k].sys_id == id) {
+              vSet = results.variable_sets[k];
+            }
+          }
+        }
+
+        vSetPolicyIssues += vSet.ui_policies.length;
+        vSetVariableIssues += vSet.variables.length;
+        vSetScriptIssues += this._getScriptTotal(vSet);
+      }
+
+      vSetTotalIssues = vSetPolicyIssues + vSetVariableIssues + vSetScriptIssues;
+
+      totalIssues = policyIssues + variablesIssues + vSetTotalIssues + scriptsIssues;
+      totalIssuesNoVSet = policyIssues + variablesIssues + scriptsIssues;
+
+      csvOut += item.name + ',' + totalIssues + ',' + totalIssuesNoVSet + ',' + vSetTotalIssues + ',' + policyIssues + ',' + variablesIssues + ',' + scriptsIssues + ',' + vSetPolicyIssues + ',' + vSetVariableIssues + ',' + vSetScriptIssues + '\n';
+    }
+
+    csvOut += "\n\n\nVariable Set,Total Issues,Desktop UI Policies,Macro Variables,Catalog Script Issues\n";
+
+    for (var i = 0; i < results.variable_sets.length; i++) {
+
+      var vSet = results.variable_sets[i],
+        policyIssues = vSet.ui_policies.length,
+        variablesIssues = vSet.variables.length,
+        scriptsIssues = this._getScriptTotal(vSet),
+        totalIssues = 0;
+
+      totalIssues = policyIssues + variablesIssues + scriptsIssues;
+
+      csvOut += vSet.name + ',' + totalIssues + ',' + policyIssues + ',' + variablesIssues + ',' + scriptsIssues + '\n';
+    }
+
+
+    gs.info('CSV Result is \n\n\n{0}', csvOut);
+  },
+
+  _getScriptTotal: function(origin) {
+
+    var temp = 0;
+    for (var j = 0; j < origin.scripts.length; j++) {
+      for (var k = 0; k < origin.scripts[j].issues.length; k++) {
+        temp += origin.scripts[j].issues[k].count;
+      }
+    }
+
+    return temp;
+  },
+
+
+  type: 'SPCatalogAnalyzer'
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-12-14 19:59:01</sys_created_on>
+        <sys_id>f41a5b3adb1223000fe4788dbf961922</sys_id>
+        <sys_mod_count>5</sys_mod_count>
+        <sys_name>SPCatalogAnalyzer</sys_name>
+        <sys_package display_value="Instance Customizations" source="x_24859_instcustom">a78d7fd7db1213000fe4788dbf961923</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="Instance Customizations">a78d7fd7db1213000fe4788dbf961923</sys_scope>
+        <sys_update_name>sys_script_include_f41a5b3adb1223000fe4788dbf961922</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-12-14 20:47:55</sys_updated_on>
+    </sys_script_include>
+</record_update>

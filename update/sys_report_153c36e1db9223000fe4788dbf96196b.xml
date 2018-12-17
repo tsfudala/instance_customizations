@@ -20,12 +20,12 @@
         <chart_title_y_position>0</chart_title_y_position>
         <chart_width>600</chart_width>
         <color display_value="Default Color">de699435d7033100b4964ebfae610331</color>
-        <color_palette display_value="Blues light to dark (9)">675da58dd7500200b96d45a3ce61038c</color_palette>
+        <color_palette display_value="Blues dark to light (5)">4566db19d7100200b96d45a3ce610319</color_palette>
         <colors/>
         <column/>
         <compute_percent>aggregate</compute_percent>
         <content/>
-        <created_by_user display_value="Todd Fudala">8b7b12d2db0113000fe4788dbf961939</created_by_user>
+        <created_by_user display_value="System Administrator">6816f79cc0a8016401c5a33be04be441</created_by_user>
         <custom_chart_size>false</custom_chart_size>
         <custom_chart_title_position>false</custom_chart_title_position>
         <custom_config/>
@@ -33,14 +33,17 @@
         <description/>
         <direction>minimize</direction>
         <display_column_lines>false</display_column_lines>
-        <display_grid>true</display_grid>
+        <display_grid>false</display_grid>
         <display_row_lines>false</display_row_lines>
         <donut_width_percent>50</donut_width_percent>
         <end_time/>
         <exp_report_attrs>true</exp_report_attrs>
         <field>name</field>
         <field_list/>
-        <filter table="x_24859_instcustom_db_object_metric">nameSTARTSWITHu_<item endquery="false" field="name" goto="false" newquery="false" operator="STARTSWITH" or="false" value="u_"/>
+        <filter table="x_24859_instcustom_db_object_metric">name!=Task^super_class!=Task^nameNOT LIKEcmdb^nameNOT LIKEdscy<item endquery="false" field="name" goto="false" newquery="false" operator="!=" or="false" value="Task"/>
+            <item endquery="false" field="super_class" goto="false" newquery="false" operator="!=" or="false" value="Task"/>
+            <item endquery="false" field="name" goto="false" newquery="false" operator="NOT LIKE" or="false" value="cmdb"/>
+            <item endquery="false" field="name" goto="false" newquery="false" operator="NOT LIKE" or="false" value="dscy"/>
         </filter>
         <from/>
         <funnel_neck_percent>30</funnel_neck_percent>
@@ -81,7 +84,7 @@
         <show_chart_border>false</show_chart_border>
         <show_chart_data_label>true</show_chart_data_label>
         <show_chart_title>report</show_chart_title>
-        <show_chart_total>true</show_chart_total>
+        <show_chart_total>false</show_chart_total>
         <show_data_label_position_middle>false</show_data_label_position_middle>
         <show_empty>false</show_empty>
         <show_geographical_label>false</show_geographical_label>
@@ -93,19 +96,19 @@
         <start_time/>
         <sumfield>size</sumfield>
         <sys_class_name>sys_report</sys_class_name>
-        <sys_created_by>todd.fudala</sys_created_by>
-        <sys_created_on>2018-05-31 16:42:25</sys_created_on>
-        <sys_id>092d8ca7db5213000fe4788dbf961924</sys_id>
-        <sys_mod_count>4</sys_mod_count>
-        <sys_name>Custom Fields for Global Custom Table</sys_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-12-10 20:30:36</sys_created_on>
+        <sys_id>153c36e1db9223000fe4788dbf96196b</sys_id>
+        <sys_mod_count>2</sys_mod_count>
+        <sys_name>Fields Added to non-Task &amp; non-CMDB Based Tables</sys_name>
         <sys_package display_value="Instance Customizations" source="x_24859_instcustom">a78d7fd7db1213000fe4788dbf961923</sys_package>
         <sys_policy/>
         <sys_scope display_value="Instance Customizations">a78d7fd7db1213000fe4788dbf961923</sys_scope>
-        <sys_update_name>sys_report_092d8ca7db5213000fe4788dbf961924</sys_update_name>
+        <sys_update_name>sys_report_153c36e1db9223000fe4788dbf96196b</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2018-12-10 20:38:10</sys_updated_on>
+        <sys_updated_on>2018-12-10 20:32:23</sys_updated_on>
         <table>x_24859_instcustom_db_object_metric</table>
-        <title>Custom Fields for Global Custom Table</title>
+        <title>Fields Added to non-Task &amp; non-CMDB Based Tables</title>
         <title_horizontal_alignment>center</title_horizontal_alignment>
         <title_vertical_alignment>top</title_vertical_alignment>
         <to/>

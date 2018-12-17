@@ -2,19 +2,19 @@
 <record_update table="sys_report_users_groups">
     <sys_report_users_groups action="INSERT_OR_UPDATE">
         <group_id/>
-        <report_id display_value="Fields Added group by Extends Table">f1e7cde7dbd213000fe4788dbf96199f</report_id>
+        <report_id display_value="Fields Added to non-Task Based Tables">66ebfeaddb5223000fe4788dbf96197f</report_id>
         <sys_class_name>sys_report_users_groups</sys_class_name>
         <sys_created_by>admin</sys_created_by>
-        <sys_created_on>2018-05-31 20:59:09</sys_created_on>
-        <sys_id>79e7cde7dbd213000fe4788dbf96199f</sys_id>
+        <sys_created_on>2018-12-10 20:29:19</sys_created_on>
+        <sys_id>eaebfeaddb5223000fe4788dbf96197f</sys_id>
         <sys_mod_count>0</sys_mod_count>
-        <sys_name>f1e7cde7dbd213000fe4788dbf96199f</sys_name>
+        <sys_name>66ebfeaddb5223000fe4788dbf96197f</sys_name>
         <sys_package display_value="Instance Customizations" source="x_24859_instcustom">a78d7fd7db1213000fe4788dbf961923</sys_package>
         <sys_policy/>
         <sys_scope display_value="Instance Customizations">a78d7fd7db1213000fe4788dbf961923</sys_scope>
-        <sys_update_name>sys_report_users_groups_79e7cde7dbd213000fe4788dbf96199f</sys_update_name>
+        <sys_update_name>sys_report_users_groups_eaebfeaddb5223000fe4788dbf96197f</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2018-05-31 20:59:09</sys_updated_on>
+        <sys_updated_on>2018-12-10 20:29:19</sys_updated_on>
         <user_id display_value="System Administrator">6816f79cc0a8016401c5a33be04be441</user_id>
     </sys_report_users_groups>
 </record_update>

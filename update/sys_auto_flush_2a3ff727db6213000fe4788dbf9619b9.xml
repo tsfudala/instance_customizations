@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <record_update table="sys_auto_flush">
     <sys_auto_flush action="INSERT_OR_UPDATE">
-        <active>true</active>
+        <active>false</active>
         <age>60</age>
         <cascade_delete>false</cascade_delete>
         <conditions/>
@@ -11,14 +11,14 @@
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2018-06-13 20:36:22</sys_created_on>
         <sys_id>2a3ff727db6213000fe4788dbf9619b9</sys_id>
-        <sys_mod_count>2</sys_mod_count>
+        <sys_mod_count>3</sys_mod_count>
         <sys_name>x_24859_instcustom_db_object_metric</sys_name>
         <sys_package display_value="Instance Customizations" source="x_24859_instcustom">a78d7fd7db1213000fe4788dbf961923</sys_package>
         <sys_policy/>
         <sys_scope display_value="Instance Customizations">a78d7fd7db1213000fe4788dbf961923</sys_scope>
         <sys_update_name>sys_auto_flush_2a3ff727db6213000fe4788dbf9619b9</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2018-06-14 04:39:11</sys_updated_on>
+        <sys_updated_on>2018-12-11 23:18:04</sys_updated_on>
         <tablename>x_24859_instcustom_db_object_metric</tablename>
     </sys_auto_flush>
 </record_update>

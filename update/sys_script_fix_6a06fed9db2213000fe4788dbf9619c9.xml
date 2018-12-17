@@ -3,230 +3,26 @@
     <sys_script_fix action="INSERT_OR_UPDATE">
         <active>true</active>
         <before>false</before>
-        <description/>
+        <description>Truncate the working table and then run analysis to populate the working table.</description>
         <flush_cache>false</flush_cache>
         <name>Build Metrics</name>
         <run_once>true</run_once>
-        <script><![CDATA[//getCustomerTables(false);
-//getCustomerTables(true);
-//getCustomizedTaskTables();
-//getCustomizedNonTaskTables();
-getTask();
-
-function getTask(tbl_name){
-  var db = new GlideRecord('sys_db_object');
-  var table_name = '';
-  var table_display_name = '';
-  var title = '';
-  var display = '';
-  var records = 0;
-
-
-
-  db.addEncodedQuery('name=' + tbl_name);
-  db.orderBy('name');
-  //db.setLimit(10);
-  db.query();
-  while (db.next()) {
-
-    table_name = db.name;
-    table_extends = db.super_class.getDisplayValue();
-    if (getCustomFieldCount(table_name) > 0) {
-        getCustomFields(table_name, table_extends);
-        display = title;
-        display += table_name;
-        gs.info(display);
-        records++;
-    }
-
-
-  }
-
-        gs.info(records + 'records affected');
-
-}
-
-function getCustomerTables(extended) {
-
-    var db = new GlideRecord('sys_db_object');
-    var table_name = '';
-    var table_display_name = '';
-    var table_extends = '';
-    var title = '';
-    var display = '';
-
-    if (extended) {
-        // Exclude Import Tables (super_class=Import Table)
-        db.addEncodedQuery('nameSTARTSWITHu_^super_classNOT LIKEimport^super_classISNOTEMPTY');
-    } else {
-        db.addEncodedQuery('nameSTARTSWITHu_^super_classISEMPTY');
-    }
-
-    //sys_name!=Import Set Row
-
-    //db.setLimit(50);
-    db.query();
-    while (db.next()) {
-
-        table_name = db.name;
-        table_display_name = db.getDisplayValue();
-        table_extends = db.super_class.getDisplayValue();
-        display = title;
-        display += table_name + ',';
-        if (table_extends != '') {
-            display += ',' + table_extends;
-        }
-        //display += ' : ' + getCustomFieldCount(table_name);
-        //gs.info(display);
-        getCustomFields(table_name, table_extends);
-
-
-    }
-
-}
-
-function getCustomFields(table_name, table_extends) {
-
-    var db = new GlideRecord('sys_dictionary');
-    var field_name = '';
-    var type = '';
-    var field_display_name = '';
-    var title = '';
-    var display = '';
-
-
-    db.addEncodedQuery('name=' + table_name + '^elementSTARTSWITHu_');
-    db.query();
-    while (db.next()) {
-
-        display = title;
-        display = table_name + ',' + table_extends + ',' + db.element;
-        display += ',' + db.internal_type;
-        display += ',' + db.max_length;
-        gs.info(display);
-
-    }
-
-}
-
-function getCustomFieldCount(table_name) {
-    var count = 0;
-    var db = new GlideAggregate('sys_dictionary');
-    db.addEncodedQuery('GOTOnameLIKE' + table_name + '^elementSTARTSWITHu_');
-    db.addAggregate('COUNT');
-    db.query();
-    if (db.next())
-        count = db.getAggregate('COUNT');
-    return count;
-
-
-}
-
-function getCustomizedTaskTables() {
-
-    var db = new GlideRecord('sys_db_object');
-    var table_name = '';
-    var table_display_name = '';
-    var title = '';
-    var display = '';
-    var records = 0;
-
-    db.addEncodedQuery('nameNOT LIKEu_^super_class=0e7b4963db02220000745df3ce961980');
-    db.orderBy('name');
-    //db.setLimit(10);
-    db.query();
-    while (db.next()) {
-
-      table_name = db.name;
-      table_extends = db.super_class.getDisplayValue();
-      if (getCustomFieldCount(table_name) > 0) {
-          getCustomFields(table_name, table_extends);
-          display = title;
-          display += table_name;
-          gs.info(display);
-          records++;
-      }
-
-
-    }
-
-          gs.info(records + 'records affected');
-
-}
-
-function getRotatedTables() {
-    var table_name = '';
-    var sys_id = '';
-    var db = new GlideRecord('sys_table_rotation');
-    db.orderBy('name');
-    db.query();
-    while (db.next()) {
-
-        table_name = db.name;
-        sys_id = db.sys_id;
-        display = table_name + ',';
-        display += sys_id;
-        gs.info(display);
-
-    }
-
-    return db;
-}
-
-function getCustomizedNonTaskTables() {
-
-
-    var db = new GlideRecord('sys_db_object');
-    var table_name = '';
-    var table_display_name = '';
-    var table_extends = '';
-    var title = '';
-    var display = '';
-
-    db.addEncodedQuery('nameNOT LIKEu_^nameNOT LIKE00^nameNOT LIKEts_^nameNOT LIKElog^super_class!=0e7b4963db02220000745df3ce961980');
-
-    db.orderBy('name');
-    //db.setLimit(10);
-    db.query();
-    while (db.next()) {
-
-        table_name = db.name;
-        table_extends = db.super_class.getDisplayValue();
-        if (getCustomFieldCount(table_name) > 0) {
-            getCustomFields(table_name, table_extends);
-            display = title;
-            display += table_name;
-            //gs.info(display);
-        }
-
-
-    }
-
-
-}
-
-function getGlideRecord(table_name, encoded_query) {
-
-  var db = new GlideRecord(table_name);
-  db.addEncodedQuery(encoded_query);
-  db.orderBy('name');
-  db.query();
-  return db;
-
-}
-]]></script>
+        <script><![CDATA[//Get an instance of the util class
+var util = new CustomizationsUtil();
+util.truncateWorkingTable();
+util.writeAllDbObjectMetrics();]]></script>
         <sys_class_name>sys_script_fix</sys_class_name>
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2018-06-06 15:32:38</sys_created_on>
         <sys_id>6a06fed9db2213000fe4788dbf9619c9</sys_id>
-        <sys_mod_count>0</sys_mod_count>
+        <sys_mod_count>3</sys_mod_count>
         <sys_name>Build Metrics</sys_name>
         <sys_package display_value="Instance Customizations" source="x_24859_instcustom">a78d7fd7db1213000fe4788dbf961923</sys_package>
         <sys_policy/>
         <sys_scope display_value="Instance Customizations">a78d7fd7db1213000fe4788dbf961923</sys_scope>
         <sys_update_name>sys_script_fix_6a06fed9db2213000fe4788dbf9619c9</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2018-06-06 15:32:38</sys_updated_on>
+        <sys_updated_on>2018-12-10 19:19:58</sys_updated_on>
         <unloadable>false</unloadable>
     </sys_script_fix>
 </record_update>
