@@ -59,6 +59,7 @@ SPCatalogAnalyzer.prototype = {
   showJSON: false,
   prettifyJSONResults: false,
   showCSV: true,
+  showZero: true,
 
   initialize: function(itemSysIds) {
     this.itemSysIds = itemSysIds;
@@ -70,16 +71,19 @@ SPCatalogAnalyzer.prototype = {
 
     var items = [];
     var variableSetQuery = '';
+    var uri = gs.getProperty('glide.servlet.uri');
 
     var itemGR = new GlideRecord('sc_cat_item');
     itemGR.addEncodedQuery('active=true^sys_idIN' + this.itemSysIds.join(','));
+    // Remove the system catalog items that are used for admin functions, same across all instances.
+    itemGR.addQuery('sc_catalogs', 'DOES NOT CONTAIN', '0b22fd2ad7021100b9a5c7400e610319');
     //itemGR.addQuery('name', this.itemSysIds[i]);
     if (this.debug) {
       gs.info('Using Search query for Items : {0}', itemGR.getEncodedQuery());
     }
     itemGR.query();
 
-
+    gs.info('Analyzing {0} Catalog Items:', itemGR.getRowCount());
 
     while (itemGR.next()) {
 
@@ -89,12 +93,15 @@ SPCatalogAnalyzer.prototype = {
 
       variableSetQuery += 'sc_cat_item=' + itemGR.getUniqueValue() + (itemGR.hasNext() ? '^OR' : '');
 
-      itemResult.name = itemGR.getDisplayValue();
+      itemResult.name = itemGR.getDisplayValue().replace(',', '');
       itemResult.sys_id = itemGR.getUniqueValue();
       itemResult.ui_policies = this.checkUIPolicies(itemGR, 'catalog_item');
       itemResult.variables = this.checkVariables(itemGR, 'cat_item');
       itemResult.referenced_variable_sets = this.getItemVariableSets(itemGR);
       itemResult.scripts = this.checkCatalogScripts(itemGR, 'cat_item');
+      itemResult.url = uri + itemGR.getLink(true);
+      itemResult.update_ts = itemGR.sys_updated_on;
+      itemResult.updated_by = itemGR.sys_updated_by;
 
       items.push(itemResult);
     }
@@ -227,7 +234,6 @@ SPCatalogAnalyzer.prototype = {
     }
     return linkedVariableSets;
   },
-
 
   _addScriptFlags: function(field) {
 
@@ -379,7 +385,7 @@ SPCatalogAnalyzer.prototype = {
 
   outputCSVResults: function(results) {
 
-    var csvOut = 'Item,Total Issues,Item Issues,Variable Set Issues,Desktop UI Policies,Macro Variables,Catalog Script Issues,Variable Set Desktop UI Policies,Variable Set Macros,Variable Set Script Issues\n';
+    var csvOut = 'Item,URL,Updated,Updated by,Total Issues,Item Issues,Variable Set Issues,Desktop UI Policies,Macro Variables,Catalog Script Issues,Variable Set Desktop UI Policies,Variable Set Macros,Variable Set Script Issues\n';
 
     for (var i = 0; i < results.items.length; i++) {
 
@@ -417,8 +423,9 @@ SPCatalogAnalyzer.prototype = {
 
       totalIssues = policyIssues + variablesIssues + vSetTotalIssues + scriptsIssues;
       totalIssuesNoVSet = policyIssues + variablesIssues + scriptsIssues;
+      if (totalIssues == 0 && this.showZero == false) { continue; }
 
-      csvOut += item.name + ',' + totalIssues + ',' + totalIssuesNoVSet + ',' + vSetTotalIssues + ',' + policyIssues + ',' + variablesIssues + ',' + scriptsIssues + ',' + vSetPolicyIssues + ',' + vSetVariableIssues + ',' + vSetScriptIssues + '\n';
+      csvOut += item.name + ',' + item.url + ',' + item.update_ts + ',' + item.updated_by + ',' + totalIssues + ',' + totalIssuesNoVSet + ',' + vSetTotalIssues + ',' + policyIssues + ',' + variablesIssues + ',' + scriptsIssues + ',' + vSetPolicyIssues + ',' + vSetVariableIssues + ',' + vSetScriptIssues + '\n';
     }
 
     csvOut += "\n\n\nVariable Set,Total Issues,Desktop UI Policies,Macro Variables,Catalog Script Issues\n";
@@ -432,6 +439,8 @@ SPCatalogAnalyzer.prototype = {
         totalIssues = 0;
 
       totalIssues = policyIssues + variablesIssues + scriptsIssues;
+
+        if (totalIssues == 0 && this.showZero == false) { continue; }
 
       csvOut += vSet.name + ',' + totalIssues + ',' + policyIssues + ',' + variablesIssues + ',' + scriptsIssues + '\n';
     }
@@ -460,13 +469,13 @@ SPCatalogAnalyzer.prototype = {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2018-12-14 19:59:01</sys_created_on>
         <sys_id>f41a5b3adb1223000fe4788dbf961922</sys_id>
-        <sys_mod_count>5</sys_mod_count>
+        <sys_mod_count>29</sys_mod_count>
         <sys_name>SPCatalogAnalyzer</sys_name>
         <sys_package display_value="Instance Customizations" source="x_24859_instcustom">a78d7fd7db1213000fe4788dbf961923</sys_package>
-        <sys_policy>read</sys_policy>
+        <sys_policy>protected</sys_policy>
         <sys_scope display_value="Instance Customizations">a78d7fd7db1213000fe4788dbf961923</sys_scope>
         <sys_update_name>sys_script_include_f41a5b3adb1223000fe4788dbf961922</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2018-12-14 20:47:55</sys_updated_on>
+        <sys_updated_on>2018-12-18 23:44:13</sys_updated_on>
     </sys_script_include>
 </record_update>
