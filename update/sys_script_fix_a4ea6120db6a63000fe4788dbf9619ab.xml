@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_script_fix">
+    <sys_script_fix action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <before>false</before>
+        <description/>
+        <flush_cache>false</flush_cache>
+        <name>Check Catalog Item</name>
+        <run_once>true</run_once>
+        <script><![CDATA[var itemSysIds = [];
+var catalogItems = new GlideRecord('sc_cat_item');
+catalogItems.addEncodedQuery('sys_nameISNOTEMPTY^sys_name!=NULL^nameISNOTEMPTY^name!=NULL^active=true');
+catalogItems.orderBy('name');
+catalogItems.query();
+
+while (catalogItems.next()) {
+  itemSysIds.push(catalogItems.getUniqueValue());
+  if(gs.nil(catalogItems.getValue('name'))){
+    gs.info('found NIL object name: ' + catalogItems.sys_id);
+  }
+}
+
+
+var util = new SPCatalogAnalyzer(itemSysIds);
+util.debug = false;
+util.showJSON = false;
+util.prettifyJSONResults = false;
+util.showCSV = true;
+util.showZero = true;
+util.analyze();
+]]></script>
+        <sys_class_name>sys_script_fix</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2018-12-19 22:18:01</sys_created_on>
+        <sys_id>a4ea6120db6a63000fe4788dbf9619ab</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Check Catalog Item</sys_name>
+        <sys_package display_value="Instance Customizations" source="x_24859_instcustom">a78d7fd7db1213000fe4788dbf961923</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="Instance Customizations">a78d7fd7db1213000fe4788dbf961923</sys_scope>
+        <sys_update_name>sys_script_fix_a4ea6120db6a63000fe4788dbf9619ab</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2018-12-19 22:18:01</sys_updated_on>
+        <unloadable>false</unloadable>
+    </sys_script_fix>
+</record_update>

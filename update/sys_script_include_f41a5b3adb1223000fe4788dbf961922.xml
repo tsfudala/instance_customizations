@@ -14,8 +14,9 @@
 // Some known caveats about these results:
 // -> Scripts in UI policies are not evaluated.
 // -> Commented code shows as false positives.
+// -> Identifcation of containers inside containers and containers in variable sets are not evaluated
 
-// uncomment to target specific items
+// example background script to target specific items
 /*
 var itemSysIds = [
 '76d675e7138a6704279b51a63244b057',
@@ -23,14 +24,30 @@ var itemSysIds = [
 ];
  */
 
-// uncomment to target all catalog items
+// example background script to target all catalog items
 /*
 var itemSysIds = [];
 var catalogItems = new GlideRecord('sc_cat_item');
+catalogItems.addEncodedQuery('sys_nameISNOTEMPTY^sys_name!=NULL^nameISNOTEMPTY^name!=NULL^active=true');
+catalogItems.orderBy('name');
 catalogItems.query();
+
 while (catalogItems.next()) {
   itemSysIds.push(catalogItems.getUniqueValue());
+  if(gs.nil(catalogItems.getValue('name'))){
+    gs.info('found NIL object name: ' + catalogItems.sys_id);
+  }
 }
+
+
+var util = new SPCatalogAnalyzer(itemSysIds);
+util.debug = false;
+util.showJSON = false;
+util.prettifyJSONResults = false;
+util.showCSV = true;
+util.showZero = true;
+util.analyze();
+
 */
 
 var SPCatalogAnalyzer = Class.create();
@@ -74,7 +91,7 @@ SPCatalogAnalyzer.prototype = {
     var uri = gs.getProperty('glide.servlet.uri');
 
     var itemGR = new GlideRecord('sc_cat_item');
-    itemGR.addEncodedQuery('active=true^sys_idIN' + this.itemSysIds.join(','));
+    itemGR.addEncodedQuery('sys_nameISNOTEMPTY^sys_name!=NULL^nameISNOTEMPTY^name!=NULL^active=true^sys_idIN' + this.itemSysIds.join(','));
     // Remove the system catalog items that are used for admin functions, same across all instances.
     itemGR.addQuery('sc_catalogs', 'DOES NOT CONTAIN', '0b22fd2ad7021100b9a5c7400e610319');
     //itemGR.addQuery('name', this.itemSysIds[i]);
@@ -100,8 +117,10 @@ SPCatalogAnalyzer.prototype = {
       itemResult.referenced_variable_sets = this.getItemVariableSets(itemGR);
       itemResult.scripts = this.checkCatalogScripts(itemGR, 'cat_item');
       itemResult.url = uri + itemGR.getLink(true);
-      itemResult.update_ts = itemGR.sys_updated_on;
-      itemResult.updated_by = itemGR.sys_updated_by;
+      itemResult.update_ts = itemGR.getValue('sys_updated_on');
+      itemResult.updated_by = itemGR.getValue('sys_updated_by');
+      //itemResult.update_ts = itemGR.sys_updated_on;
+      //itemResult.updated_by = itemGR.sys_updated_by;
 
       items.push(itemResult);
     }
@@ -178,6 +197,7 @@ SPCatalogAnalyzer.prototype = {
     var desktopPolicies = new GlideRecord('catalog_ui_policy');
     desktopPolicies.addQuery(type, parentGR.sys_id);
     desktopPolicies.addQuery('ui_type', '0');
+    //run_scripts=true^ui_type!=10 - think this is the right query - tf
     desktopPolicies.query();
     while (desktopPolicies.next()) {
 
@@ -440,7 +460,7 @@ SPCatalogAnalyzer.prototype = {
 
       totalIssues = policyIssues + variablesIssues + scriptsIssues;
 
-        if (totalIssues == 0 && this.showZero == false) { continue; }
+      if (totalIssues == 0 && this.showZero == false) { continue; }
 
       csvOut += vSet.name + ',' + totalIssues + ',' + policyIssues + ',' + variablesIssues + ',' + scriptsIssues + '\n';
     }
@@ -469,13 +489,13 @@ SPCatalogAnalyzer.prototype = {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2018-12-14 19:59:01</sys_created_on>
         <sys_id>f41a5b3adb1223000fe4788dbf961922</sys_id>
-        <sys_mod_count>29</sys_mod_count>
+        <sys_mod_count>45</sys_mod_count>
         <sys_name>SPCatalogAnalyzer</sys_name>
         <sys_package display_value="Instance Customizations" source="x_24859_instcustom">a78d7fd7db1213000fe4788dbf961923</sys_package>
         <sys_policy>protected</sys_policy>
         <sys_scope display_value="Instance Customizations">a78d7fd7db1213000fe4788dbf961923</sys_scope>
         <sys_update_name>sys_script_include_f41a5b3adb1223000fe4788dbf961922</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2018-12-18 23:44:13</sys_updated_on>
+        <sys_updated_on>2018-12-19 23:25:12</sys_updated_on>
     </sys_script_include>
 </record_update>
