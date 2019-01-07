@@ -2,7 +2,7 @@
 <record_update table="sys_report_users_groups">
     <sys_report_users_groups action="INSERT_OR_UPDATE">
         <group_id/>
-        <report_id display_value="Custom Fields for Global Custom Table">092d8ca7db5213000fe4788dbf961924</report_id>
+        <report_id display_value="Custom Fields in Global Tables">092d8ca7db5213000fe4788dbf961924</report_id>
         <sys_class_name>sys_report_users_groups</sys_class_name>
         <sys_created_by>todd.fudala</sys_created_by>
         <sys_created_on>2018-05-31 16:42:25</sys_created_on>

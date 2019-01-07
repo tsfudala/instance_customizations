@@ -10,235 +10,260 @@
         <script><![CDATA[
 var CustomizationsUtil = Class.create();
 CustomizationsUtil.prototype = {
-	initialize: function() {},
+	initialize: function() { },
 
-		getGlideRecord: function(table_name, encoded_query) {
+	getGlideRecord: function(table_name, encoded_query, limit) {
 
-			var db = new GlideRecord(table_name);
-			db.addEncodedQuery(encoded_query);
-			db.orderBy('name');
-			db.query();
-			return db;
+		var db = new GlideRecord(table_name);
+		db.addEncodedQuery(encoded_query);
+		db.orderBy('name');
+		if(limit) {
+			db.setLimit(limit);
+			gs.info('Glide query return limit set to ' + limit);
+		}
 
-		},
-		getSingleGlideRecord: function(table_name, column, value) {
-			var db = new GlideRecord(table_name);
-			db.get(column, value);
-			return db;
-		},
-		getTaskSysID: function() {
-			var db = new GlideRecord('sys_db_object');
-			db.get('name', 'task');
-			return db.sys_id;
-		},
-		getCustomFieldCount: function(table_name) {
-			var count = 0;
-			var db = new GlideAggregate('sys_dictionary');
-			db.addEncodedQuery('name=' + table_name + '^elementSTARTSWITHu_');
-			db.addAggregate('COUNT');
-			db.query();
-			if (db.next())
-				count = db.getAggregate('COUNT');
-			return count;
-		},
-		getSuperClass: function(table_name) {
-			var db = new GlideRecord('sys_db_object');
-			db.get('name', table_name);
-			var parent = db.super_class.getDisplayValue();
-			if (parent == '') {
-				return 'BASE';
-			} {
-				return parent;
-			}
-		},
-		displayRotatedTables: function() {
-			var db = this.getGlideRecord('sys_table_rotation');
-			var display = '';
-			while (db.next()) {
-				display = '';
-				display = db.name + ',';
-				display += db.sys_id;
-				gs.info(display);
-			}
+		db.query();
+		return db;
 
-			return db;
-		},
-		displayCustomFieldsCSV: function(table_name) {
+	},
+	getSingleGlideRecord: function(table_name, column, value) {
+		var db = new GlideRecord(table_name);
+		db.get(column, value);
+		return db;
+	},
+	getTaskSysID: function() {
+		var db = new GlideRecord('sys_db_object');
+		db.get('name', 'task');
+		return db.sys_id;
+	},
+	getCustomFieldCount: function(table_name) {
+		var count = 0;
+		var db = new GlideAggregate('sys_dictionary');
+		db.addEncodedQuery('name=' + table_name + '^elementSTARTSWITHu_');
+		db.addAggregate('COUNT');
+		db.query();
+		if (db.next())
+			count = db.getAggregate('COUNT');
+		return count;
+	},
+	getSuperClass: function(table_name) {
+		var db = new GlideRecord('sys_db_object');
+		db.get('name', table_name);
+		var parent = db.super_class.getDisplayValue();
+		if (parent == '') {
+			return 'BASE';
+		} {
+			return parent;
+		}
+	},
+	displayRotatedTables: function() {
+		var db = this.getGlideRecord('sys_table_rotation');
+		var display = '';
+		while (db.next()) {
+			display = '';
+			display = db.name + ',';
+			display += db.sys_id;
+			gs.info(display);
+		}
 
-			var db = this.getGlideRecord('sys_dictionary', 'name=' + table_name + '^elementSTARTSWITHu_');
+		return db;
+	},
+	displayCustomFieldsCSV: function(table_name) {
 
-			var title = '';
-			var display = '';
-			var inst = gs.getProperty('instance_name');
-			while (db.next()) {
-				display = title;
-				display += inst;
-				display += ',' + db.name;
-				display += ',' + this.getSuperClass(table_name);
-				display += ',' + db.element;
-				display += ',' + db.internal_type;
-				display += ',' + db.max_length;
-				gs.info(display);
-			}
+		var db = this.getGlideRecord('sys_dictionary', 'name=' + table_name + '^elementSTARTSWITHu_');
 
-		},
-		getCustomFieldsJSON: function(table_name) {
-			var db = this.getGlideRecord('sys_dictionary', 'name=' + table_name + '^elementSTARTSWITHu_');
-			var inst = gs.getProperty('instance_name');
-			var display = '';
-			var fields = {}; //JSON object to hold custom fields
-			var objRow = {}; //JSON object to hold the custom field attributes
-			var row_key = '';
-					while (db.next()) {
-            //NOTE: The JSON object [attribute] must MATCH the table [field name]
-						objRow.instance = inst;
-						objRow.name = db.name.toString();
-						objRow.field = db.element.toString();
-						objRow.type = db.internal_type.toString();
-						objRow.size = db.max_length.toString();
-						objRow.super_class = this.getSuperClass(table_name);
-						row_key = objRow.name + '.' + objRow.field;
-						fields[row_key] = JSON.stringify(objRow);
-						//gs.info(fields[row_key]);
-					}
-					return fields;
-				},
+		var title = '';
+		var display = '';
+		var inst = gs.getProperty('instance_name');
+		while (db.next()) {
+			display = title;
+			display += inst;
+			display += ',' + db.name;
+			display += ',' + this.getSuperClass(table_name);
+			display += ',' + db.element;
+			display += ',' + db.internal_type;
+			display += ',' + db.max_length;
+			gs.info(display);
+		}
 
-		getTaskExtendedTablesGR: function() {
-					var sysid = this.getTaskSysID();
-					var db = this.getGlideRecord('sys_db_object', 'super_class=' + sysid + '^ORsys_id=' + sysid);
-          return db;
-				},
-		getNonTaskExtendedTablesGR: function() {
-					var sysid = this.getTaskSysID();
-					var db = this.getGlideRecord('sys_db_object', 'nameSTARTSWITHu_');
-					return db;
-				},
-
-    getTaskTablesJSON: function() {
-
-      var tables = {};
-      var table_name = '';
-      var db = this.getTaskExtendedTablesGR();
-      while (db.next()) {
-        table_name = db.name.toString();
-        var custom_count = this.getCustomFieldCount(table_name);
-        if (custom_count > 0) {
-            tables[table_name] = table_name;
-            //gs.info(table_name);
-          }
-        }
-
-      return tables;
-    },
-    getNonTaskTablesJSON: function() {
-
-      var tables = {};
-        var table_name = '';
-        var title = '';
-        //var db = new GlideRecord('sys_db_object');
-        var db = this.getNonTaskExtendedTablesGR();
-        //db.addQuery('super_classNOT LIKEImport');
-        //db.addQuery('super_classNOT LIKELog Entry');
-        //db.orderBy('name');
-        //db.query();
-
-        while (db.next()) {
-          table_name = db.name.toString();
-            var custom_count = this.getCustomFieldCount(table_name);
-            if (custom_count > 0) {
-              tables[table_name] = table_name;
-              gs.info(table_name);
-            }
-            else {
-              gs.info('no custom fields found for: ' + table_name);
-            }
-          }
-        return tables;
-      },
-
-    displayCustomizedTaskTables: function() {
-        var db = this.getGlideRecord('sys_db_object', 'super_class=' + this.getTaskSysID());
-        var table_name = '';
-        while (db.next()) {
-          table_name = db.name;
-          if (this.getCustomFieldCount(table_name) > 0) {
-            this.displayCustomFieldsCSV(table_name);
-          }
-        }
-      },
-    displayTableCustomizations: function(tbl_name) {
-        if (this.getCustomFieldCount(tbl_name) > 0) {
-          this.displayCustomFieldsCSV(tbl_name);
-        } else {
-          gs.info('No customizations detected.');
-        }
-
-
-      },
-
-    writeDbObjectMetrics: function(table_name) {
-        var sys_ids = [];
-        var data = this.getCustomFieldsJSON(table_name);
-        // data contains an object in this format {"table.field_name":JSON Object}
-          // The JSON Object contains attributes we want to write to the metric table
-          for (var d in data) {
-            //gs.info(data[d]);
-            var attributes = JSON.parse(data[d]);
-            var db = new GlideRecord('x_24859_instcustom_db_object_metric');
-            db.initialize();
-            for (var a in attributes) {
-              //gs.info(a + ':' + attributes[a]);
-              //Set DB field values to matching JSON Object values
-              //NOTE: The JSON object [attribute] must MATCH the table [field name] for this to work.
-              db[a] = attributes[a];
-            }
-            sys_ids.push(db.insert());
-          }
-
-          return JSON.stringify(sys_ids);
-        },
-    writeAllDbObjectMetrics: function() {
-
-          var task = this.getTaskTablesJSON();
-          var non_task = this.getNonTaskTablesJSON();
-          var t_count = 0;
-          var nt_count = 0;
-          for(var t in task){
-            gs.info(t);
-            this.writeDbObjectMetrics(t);
-            t_count++;
-          }
-          for(var nt in non_task){
-            gs.info(nt);
-            this.writeDbObjectMetrics(nt);
-            nt_count++;
-          }
-
-          gs.info(t_count + ' task extended records written');
-          gs.info(nt_count + ' non-task extended records written');
-
-        },
-
-    truncateWorkingTable: function() {
-		    var gr = new GlideRecord("x_24859_instcustom_db_object_metric");
-		    gr.deleteMultiple();
+	},
+	getCustomFieldsJSON: function(table_name) {
+		var db = this.getGlideRecord('sys_dictionary', 'name=' + table_name + '^elementSTARTSWITHu_');
+		var inst = gs.getProperty('instance_name');
+		var display = '';
+		var fields = {}; //JSON object to hold custom fields
+		var objRow = {}; //JSON object to hold the custom field attributes
+		var row_key = '';
+		while (db.next()) {
+			//NOTE: The JSON object [attribute] must MATCH the table [field name]
+			objRow.instance = inst;
+			objRow.name = db.name.toString();
+			objRow.field = db.element.toString();
+			objRow.type = db.internal_type.toString();
+			objRow.size = db.max_length.toString();
+			objRow.super_class = this.getSuperClass(table_name);
+			row_key = objRow.name + '.' + objRow.field;
+			fields[row_key] = JSON.stringify(objRow);
+			//gs.info(fields[row_key]);
+		}
+		return fields;
 	},
 
-type: 'CustomizationsUtil'
+	getTaskExtendedTablesGR: function() {
+		var sysid = this.getTaskSysID();
+		var db = this.getGlideRecord('sys_db_object', 'super_class=' + sysid + '^ORsys_id=' + sysid);
+		return db;
+	},
+	getNonTaskExtendedTablesGR: function() {
+		var sysid = this.getTaskSysID();
+		var db = this.getGlideRecord('sys_db_object', 'nameSTARTSWITHu_');
+		return db;
+	},
+
+	getTaskTablesJSON: function() {
+
+		var tables = {};
+		var table_name = '';
+		var db = this.getTaskExtendedTablesGR();
+		while (db.next()) {
+			table_name = db.name.toString();
+			var custom_count = this.getCustomFieldCount(table_name);
+			if (custom_count > 0) {
+				tables[table_name] = table_name;
+				gs.info(table_name);
+			}
+		}
+
+		return tables;
+	},
+	getNonTaskTablesJSON: function() {
+
+		var tables = {};
+		var table_name = '';
+		var title = '';
+		//var db = new GlideRecord('sys_db_object');
+		var db = this.getNonTaskExtendedTablesGR();
+		//db.addQuery('super_classNOT LIKEImport');
+		//db.addQuery('super_classNOT LIKELog Entry');
+		//db.orderBy('name');
+		//db.query();
+
+		while (db.next()) {
+			table_name = db.name.toString();
+			var custom_count = this.getCustomFieldCount(table_name);
+			if (custom_count > 0) {
+				tables[table_name] = table_name;
+				gs.info(table_name);
+			}
+			else {
+				gs.info('no custom fields found for: ' + table_name);
+			}
+		}
+		return tables;
+	},
+
+	displayCustomizedTaskTables: function() {
+		var db = this.getGlideRecord('sys_db_object', 'super_class=' + this.getTaskSysID());
+		var table_name = '';
+		while (db.next()) {
+			table_name = db.name;
+			if (this.getCustomFieldCount(table_name) > 0) {
+				this.displayCustomFieldsCSV(table_name);
+			}
+		}
+	},
+	displayTableCustomizations: function(tbl_name) {
+		if (this.getCustomFieldCount(tbl_name) > 0) {
+			this.displayCustomFieldsCSV(tbl_name);
+		} else {
+			//gs.info('No customizations detected.');
+		}
+
+
+	},
+
+	writeDbObjectMetrics: function(table_name) {
+		var sys_ids = [];
+		var data = this.getCustomFieldsJSON(table_name);
+		// data contains an object in this format {"table.field_name":JSON Object}
+		// The JSON Object contains attributes we want to write to the metric table
+		for (var d in data) {
+			//gs.info(data[d]);
+			var attributes = JSON.parse(data[d]);
+			var db = new GlideRecord('x_24859_instcustom_db_object_metric');
+			db.initialize();
+			for (var a in attributes) {
+				//gs.info(a + ':' + attributes[a]);
+				//Set DB field values to matching JSON Object values
+				//NOTE: The JSON object [attribute] must MATCH the table [field name] for this to work.
+				db[a] = attributes[a];
+			}
+			sys_ids.push(db.insert());
+		}
+
+		return JSON.stringify(sys_ids);
+	},
+	writeAllDbObjectMetrics: function() {
+
+		var task = this.getTaskTablesJSON();
+		var non_task = this.getNonTaskTablesJSON();
+		var t_count = 0;
+		var nt_count = 0;
+		for (var t in task) {
+			gs.info(t);
+			this.writeDbObjectMetrics(t);
+			t_count++;
+		}
+		for (var nt in non_task) {
+			gs.info(nt);
+			this.writeDbObjectMetrics(nt);
+			nt_count++;
+		}
+
+		gs.info(t_count + ' task extended records written');
+		gs.info(nt_count + ' non-task extended records written');
+
+	},
+
+	truncateWorkingTable: function() {
+		var gr = new GlideRecord("x_24859_instcustom_db_object_metric");
+		gr.deleteMultiple();
+
+	},
+
+	getCMDBTables: function(limit) {
+		var db = this.getGlideRecord('sys_db_object', 'nameLIKEcmdb', limit);
+		return db;
+
+	},
+
+	identifyCustomCMDBFields: function (limit) {
+
+		var db = this.getCMDBTables(limit);
+		if(limit) {
+			gs.info('CMDB class query limited to ' + limit);
+		}
+		while (db.next()) {
+			this.displayTableCustomizations(db.name);
+
+		}
+
+	},
+
+	type: 'CustomizationsUtil'
 };
 ]]></script>
         <sys_class_name>sys_script_include</sys_class_name>
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2018-06-07 14:17:09</sys_created_on>
         <sys_id>1bce2ba5db2213000fe4788dbf961989</sys_id>
-        <sys_mod_count>134</sys_mod_count>
+        <sys_mod_count>141</sys_mod_count>
         <sys_name>CustomizationsUtil</sys_name>
         <sys_package display_value="Instance Customizations" source="x_24859_instcustom">a78d7fd7db1213000fe4788dbf961923</sys_package>
         <sys_policy>read</sys_policy>
         <sys_scope display_value="Instance Customizations">a78d7fd7db1213000fe4788dbf961923</sys_scope>
         <sys_update_name>sys_script_include_1bce2ba5db2213000fe4788dbf961989</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2018-12-11 21:48:34</sys_updated_on>
+        <sys_updated_on>2019-01-02 22:36:58</sys_updated_on>
     </sys_script_include>
 </record_update>

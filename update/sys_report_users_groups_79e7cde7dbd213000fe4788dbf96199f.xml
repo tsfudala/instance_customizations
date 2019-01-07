@@ -2,7 +2,7 @@
 <record_update table="sys_report_users_groups">
     <sys_report_users_groups action="INSERT_OR_UPDATE">
         <group_id/>
-        <report_id display_value="Fields Added group by Extends Table">f1e7cde7dbd213000fe4788dbf96199f</report_id>
+        <report_id display_value="Fields Added by Table">f1e7cde7dbd213000fe4788dbf96199f</report_id>
         <sys_class_name>sys_report_users_groups</sys_class_name>
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2018-05-31 20:59:09</sys_created_on>
